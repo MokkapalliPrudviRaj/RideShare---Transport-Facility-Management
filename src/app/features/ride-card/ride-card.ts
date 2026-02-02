@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Ride } from '../../core/models/ride';
 import { VehicleType } from '../../core/models/vehicle-type';
-import { isValidEmployeeId } from '../../core/utils/utils';
+import { isValidEmployeeId, formatTimeDisplay } from '../../core/utils/utils';
 import { Icons } from '../../shared/icons/icons';
 
 @Component({
@@ -24,6 +24,7 @@ export class RideCard {
   isHovered = false;
 
   VehicleType = VehicleType;
+  formatTimeDisplay = formatTimeDisplay;
 
   get totalCapacity(): number {
     return this.ride.vacantSeats + (this.ride.passengers?.length || 0);

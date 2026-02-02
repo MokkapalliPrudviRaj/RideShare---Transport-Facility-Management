@@ -2,12 +2,13 @@ import { VehicleType } from "./vehicle-type";
 
 export interface Ride {
   id: string;
-  employeeId: string; 
+  employeeId: string;
   vehicleType: VehicleType;
   vehicleNo: string;
   vacantSeats: number;
-  time: string; 
+  time: string;
   pickupPoint: string;
   destination: string;
-  passengers: string[]; 
+  passengers: string[];
+  createdAt?: string; // ISO date string
 }

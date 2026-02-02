@@ -21,7 +21,8 @@ const SEED_DATA: Ride[] = [
     time: '09:00',
     pickupPoint: 'North Campus',
     destination: 'Downtown HQ',
-    passengers: ['EMP-505', 'EMP-606']
+    passengers: ['EMP-505', 'EMP-606'],
+    createdAt: new Date().toISOString()
   },
   {
     id: generateId(),
@@ -32,7 +33,8 @@ const SEED_DATA: Ride[] = [
     time: '10:30',
     pickupPoint: 'Main Station',
     destination: 'Innovation Lab',
-    passengers: []
+    passengers: [],
+    createdAt: new Date().toISOString()
   }
 ];
 
@@ -72,10 +74,16 @@ export class App {
   private loadRides(): Ride[] {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      // Ultimate defensive check: only parse if it looks like a JSON array
       if (typeof saved === 'string' && saved.trim().startsWith('[') && saved.trim().endsWith(']')) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : SEED_DATA;
+        const parsed = JSON.parse(saved) as Ride[];
+        if (Array.isArray(parsed)) {
+          // Enforcement: Only show rides from today
+          const today = new Date().toDateString();
+          return parsed.filter(r => {
+            if (!r.createdAt) return true; // Legacy support
+            return new Date(r.createdAt).toDateString() === today;
+          });
+        }
       }
     } catch (e) {
       console.warn('LocalStorage data was invalid JSON. Reverting to seed data.', e);
@@ -107,7 +115,8 @@ export class App {
   windowEnd = computed(() => this.timeMinutes() !== null ? minutesToTime(Math.min(1439, this.timeMinutes()! + 60)) : '');
 
   handleAddRide(newRide: Ride) {
-    this.rides.update(prev => [newRide, ...prev]);
+    const rideWithTimestamp = { ...newRide, createdAt: new Date().toISOString() };
+    this.rides.update(prev => [rideWithTimestamp, ...prev]);
     this.activeTab.set('browse');
   }
 

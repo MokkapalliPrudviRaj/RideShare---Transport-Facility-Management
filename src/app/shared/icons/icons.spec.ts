@@ -10,10 +10,11 @@ describe('Icons', () => {
     await TestBed.configureTestingModule({
       imports: [Icons]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(Icons);
     component = fixture.componentInstance;
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

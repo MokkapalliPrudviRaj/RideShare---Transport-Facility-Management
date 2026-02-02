@@ -10,10 +10,11 @@ describe('AddRideForm', () => {
     await TestBed.configureTestingModule({
       imports: [AddRideForm]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(AddRideForm);
     component = fixture.componentInstance;
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
