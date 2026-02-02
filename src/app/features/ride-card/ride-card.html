@@ -1,0 +1,109 @@
+<div class="ride-card" [class.focused]="isFocused">
+  <div class="card-content">
+    <!-- Header Section -->
+    <div class="header-row">
+      <div class="vehicle-info">
+        <div class="vehicle-icon-box" [ngClass]="ride.vehicleType === 'Bike' ? 'amber-theme' : 'blue-theme'">
+          <app-icon [name]="ride.vehicleType === 'Bike' ? 'bike' : 'car'" class="icon-sm">
+          </app-icon>
+        </div>
+        <div>
+          <h3 class="destination">{{ ride.destination }}</h3>
+          <p class="pickup">FROM: {{ ride.pickupPoint }}</p>
+        </div>
+      </div>
+      <div class="time-badge">
+        {{ ride.time }}
+      </div>
+    </div>
+
+    <!-- Seat & Vehicle Specs -->
+    <div class="specs-grid">
+      <div class="spec-card plate-card">
+        <p class="spec-label">Plate Number</p>
+        <div class="plate-badge">
+          <p class="plate-text">{{ ride.vehicleNo }}</p>
+        </div>
+      </div>
+      <div class="spec-card capacity-card">
+        <p class="spec-label">Capacity Status</p>
+        <div class="capacity-info">
+          <span class="seats-left">{{ ride.vacantSeats }} Available</span>
+          <span class="total-seats">/ {{ totalCapacity }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passenger Manifest -->
+    <div class="passenger-section">
+      <p class="spec-label passenger-label">
+        <app-icon name="users" class="icon-xs"></app-icon>
+        Passengers ({{ passengers.length }})
+      </p>
+      <div class="passenger-list">
+        <span *ngFor="let p of passengers" class="passenger-tag">{{ p }}</span>
+        <span *ngIf="passengers.length === 0" class="empty-msg">No passengers yet</span>
+        <div *ngFor="let i of vacantSeatsArray" class="empty-seat">
+          <div class="dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="booking-form">
+      <div class="input-row">
+        <div class="input-wrapper">
+          <input type="text" placeholder="EMP-XXXX" [(ngModel)]="bookingEmpId" (focus)="isFocused = true"
+            (blur)="isFocused = false" [disabled]="ride.vacantSeats === 0 || success" class="booking-input" [ngClass]="{
+              'error-state': (!isInputValidFormat && bookingEmpId.length > 3) || error,
+              'valid-state': bookingEmpId.length > 0 && isInputValidFormat && !error,
+            }" />
+          <div *ngIf="bookingEmpId.length > 0 && isInputValidFormat && !error" class="valid-icon">
+            <svg class="icon-sm" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <button (click)="handleBook()" [disabled]="
+            ride.vacantSeats === 0 || success || !isInputValidFormat || bookingEmpId.length === 0
+          " class="book-btn" [ngClass]="{ success: success, disabled: ride.vacantSeats === 0 || !isInputValidFormat }">
+          {{ success ? '✓' : 'Book' }}
+        </button>
+      </div>
+
+      <p *ngIf="!isInputValidFormat && bookingEmpId.length > 0" class="format-error">
+        Must match EMP-XXXX format
+      </p>
+
+      <div *ngIf="error" class="status-banner error">
+        <svg class="icon-xs flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd" />
+        </svg>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="success" class="status-banner success">
+        <svg class="icon-xs" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd" />
+        </svg>
+        <p>Booking Confirmed!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer" [class.hovered]="isHovered" (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
+    <div class="provider-info">
+      <span class="label">Provided By</span>
+      <span class="employee-id">{{ ride.employeeId }}</span>
+    </div>
+
+    <span *ngIf="ride.vacantSeats === 0" class="fully-booked"> Fully Booked </span>
+  </div>
+</div>

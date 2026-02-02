@@ -1,0 +1,151 @@
+<div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+    <div class="mb-8">
+        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Post a Ride Offer</h2>
+        <p class="text-xs text-slate-500 mt-1">Fill in the details below to share your journey with colleagues.</p>
+    </div>
+
+    <div *ngIf="error"
+        class="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 text-sm rounded-xl flex items-start space-x-3 animate-in fade-in">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd" />
+        </svg>
+        <span class="font-bold">{{ error }}</span>
+    </div>
+
+    <form [formGroup]="rideForm" (ngSubmit)="handleSubmit()" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Employee ID -->
+            <div class="flex flex-col space-y-2">
+                <label for="offer-emp-id" class="text-sm font-bold text-slate-700 flex justify-between">
+                    <span>Employee ID <span class="text-red-500">*</span></span>
+                </label>
+                <input id="offer-emp-id" formControlName="employeeId" type="text" autoComplete="off" class="input-base"
+                    [ngClass]="{
+            'border-slate-300': !rideForm.get('employeeId')?.touched || rideForm.get('employeeId')?.value === '',
+            'border-green-400 bg-green-50/10 focus:ring-green-100': rideForm.get('employeeId')?.touched && rideForm.get('employeeId')?.valid,
+            'border-red-400 bg-red-50/10 focus:ring-red-100': rideForm.get('employeeId')?.touched && rideForm.get('employeeId')?.invalid
+          }" placeholder="e.g. EMP-1234">
+                <p class="text-[9px] text-slate-400 font-bold tracking-tight">Format: <span
+                        class="text-slate-600">EMP-XXXX</span></p>
+            </div>
+
+            <!-- Vehicle Type -->
+            <div class="flex flex-col space-y-2">
+                <label class="text-sm font-bold text-slate-700">Vehicle Type <span class="text-red-500">*</span></label>
+                <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <button type="button" (click)="rideForm.patchValue({vehicleType: VehicleType.CAR})"
+                        class="toggle-btn" [class.active]="rideForm.get('vehicleType')?.value === VehicleType.CAR">
+                        <app-icon name="car" class="icon-sm"></app-icon>
+                        <span>Car</span>
+                    </button>
+                    <button type="button" (click)="rideForm.patchValue({vehicleType: VehicleType.BIKE})"
+                        class="toggle-btn" [class.active]="rideForm.get('vehicleType')?.value === VehicleType.BIKE">
+                        <app-icon name="bike" class="icon-sm"></app-icon>
+                        <span>Bike</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vehicle Number -->
+            <div class="flex flex-col space-y-2">
+                <label htmlFor="offer-vehicle-no" class="text-sm font-bold text-slate-700">Vehicle Number <span
+                        class="text-red-500">*</span></label>
+                <input id="offer-vehicle-no" formControlName="vehicleNo" type="text" autoComplete="off"
+                    class="input-base" [ngClass]="{
+            'border-slate-300': !rideForm.get('vehicleNo')?.touched || rideForm.get('vehicleNo')?.value === '',
+            'border-green-400 bg-green-50/10': rideForm.get('vehicleNo')?.touched && rideForm.get('vehicleNo')?.valid,
+            'border-red-400 bg-red-50/10': rideForm.get('vehicleNo')?.touched && rideForm.get('vehicleNo')?.invalid
+          }" placeholder="KA-01-AB-1234">
+                <p class="text-[9px] text-slate-400 font-bold tracking-tight uppercase">Plate Format: <span
+                        class="text-slate-600 underline">XX-00-XX-0000</span></p>
+            </div>
+
+            <!-- Vacant Seats -->
+            <div class="flex flex-col space-y-2">
+                <label class="text-sm font-bold text-slate-700">Vacant Seats <span class="text-red-500">*</span></label>
+                <div class="flex items-center space-x-3">
+                    <button type="button" (click)="adjustSeats(-1)" class="stepper-btn-minus"
+                        [disabled]="rideForm.get('vacantSeats')?.value <= 1">
+                        <app-icon name="minus" class="icon-sm"></app-icon>
+                    </button>
+                    <div class="seat-display">
+                        <span class="text-lg font-black text-slate-900">{{ rideForm.get('vacantSeats')?.value }}</span>
+                    </div>
+                    <button type="button" (click)="adjustSeats(1)" class="stepper-btn-plus"
+                        [disabled]="rideForm.get('vacantSeats')?.value >= 10">
+                        <app-icon name="plus" class="icon-sm"></app-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Improved Departure Time Selector -->
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex flex-row:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <label class="text-sm font-black text-slate-700 uppercase tracking-wide">Departure Time</label>
+                    <p class="text-xs text-slate-500 font-medium">Select your estimated departure time for today.</p>
+                </div>
+
+                <div class="relative group">
+                    <input id="offer-time-picker" type="time" formControlName="time" class="time-input">
+                    <div class="edit-badge">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex flex-wrap gap-2">
+                    <button *ngFor="let shift of commonShifts" type="button" (click)="setTime(shift.value)"
+                        class="shift-btn" [class.active]="rideForm.get('time')?.value === shift.value">
+                        {{ shift.label }}
+                    </button>
+                </div>
+
+                <div class="relative pt-6 pb-2">
+                    <input type="range" min="0" max="1435" step="5" class="time-slider" [value]="currentMinutes"
+                        (input)="onSliderChange($event)">
+                    <div class="slider-labels">
+                        <span>00:00</span>
+                        <span>06:00</span>
+                        <span>12:00</span>
+                        <span>18:00</span>
+                        <span>23:55</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Route Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col space-y-2">
+                <label for="offer-pickup" class="text-sm font-bold text-slate-700">Pick-up Point <span
+                        class="text-red-500">*</span></label>
+                <input id="offer-pickup" formControlName="pickupPoint" type="text" autoComplete="off" class="input-base"
+                    placeholder="e.g. North Gate, Main Office">
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <label for="offer-destination" class="text-sm font-bold text-slate-700">Destination <span
+                        class="text-red-500">*</span></label>
+                <input id="offer-destination" formControlName="destination" type="text" autoComplete="off"
+                    class="input-base" placeholder="e.g. South Campus, Station">
+            </div>
+        </div>
+
+        <div class="pt-4">
+            <button type="submit" [disabled]="rideForm.invalid" class="submit-btn" [class.disabled]="rideForm.invalid">
+                Confirm & Create Ride Offer
+            </button>
+            <p class="text-center text-[9px] text-slate-400 font-bold uppercase mt-4 tracking-widest">Available for
+                booking
+                immediately after posting</p>
+        </div>
+    </form>
+</div>
